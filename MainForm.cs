@@ -81,7 +81,7 @@ namespace AutoLayoutApplication
             e.Graphics.Clear(SystemColors.Control);
             foreach (Node n in this.nodes.Values)
             {
-                Brush br = Brushes.Green;
+                Brush br = this.nodes.IsLocked(n) ? Brushes.Red : Brushes.Green;
                 e.Graphics.FillEllipse(br, ToScreenX(n.R.X) - r, ToScreenY(n.R.Y) - r, 2 * r, 2 * r);
                 e.Graphics.DrawString(n.Name, SystemFonts.DefaultFont, Brushes.White, ToScreenX(n.R.X) - r / 2, ToScreenY(n.R.Y) - r / 2);
                 foreach (Node nn in n.Neighbors)
@@ -99,6 +99,33 @@ namespace AutoLayoutApplication
         private int ToScreenY(double y)
         {
             return (int)y + this.ClientSize.Height / 2;
+        }
+
+        private void MainForm_MouseDown(object sender, MouseEventArgs e)
+        {
+            this.Capture = true;
+            this.nodes.Lock(ToNodeX(e.X), ToNodeY(e.Y));
+        }
+
+        private void MainForm_MouseMove(object sender, MouseEventArgs e)
+        {
+            this.nodes.Drag(ToNodeX(e.X), ToNodeY(e.Y));
+        }
+
+        private void MainForm_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.nodes.Unlock();
+            this.Capture = false;
+        }
+
+        private double ToNodeX(int x)
+        {
+            return (double)(x - this.ClientSize.Width / 2);
+        }
+
+        private double ToNodeY(int y)
+        {
+            return (double)(y - this.ClientSize.Height / 2);
         }
     }
 }
